@@ -4,6 +4,12 @@ import pandas as pd
 import json
 import os
 
+TOTAL_SAMPLES = {'MG1': [128000],
+                 'MG2': [800000, 40000],
+                 'MG3': [150000]
+    
+}
+
 def tdms_to_csv(working_directory, export_directory):
     """
     function to convert TDMS file to CSV
@@ -13,9 +19,17 @@ def tdms_to_csv(working_directory, export_directory):
     for working_file in os.listdir(working_directory):
         us_2 = False
         if working_file.endswith(".tdms"):
-            print("Converting file ", working_file)
+            print("Converting file", working_file)
 
             in_fn = working_directory+working_file
+            if working_file[0:3] == 'MG1':
+                total_samples = TOTAL_SAMPLES['MG1']
+            elif working_file[0:3] == 'MG2':
+                total_samples = TOTAL_SAMPLES['MG2']
+            elif working_file[0:3] == 'MG3':
+                total_samples = TOTAL_SAMPLES['MG3']
+
+            print("Expected samples:", total_samples)
 
             with TdmsFile.open(in_fn) as tdms_file:
 
@@ -47,6 +61,7 @@ def tdms_to_csv(working_directory, export_directory):
                         data = r_channel[:]
                         ###   APPEND TO OUTPUT DF   ###
                         manual_df[channel_name] = data
+                        manual_df = manual_df.truncate(before=1,after=total_samples[1])
                         break
 
                     channel_name = module_id + "." + channel_id
@@ -54,6 +69,8 @@ def tdms_to_csv(working_directory, export_directory):
 
                     ###   APPEND TO OUTPUT DF   ###
                     output_df[channel_name] = data
+
+                output_df = output_df.truncate(before=1,after=total_samples[0])
 
                 #####     EXPORT DATA     #####
                 out_fn = working_file[0:3] + "_" + str(start_time) + ".csv"
