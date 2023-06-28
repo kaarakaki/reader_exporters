@@ -50,6 +50,7 @@ def tdms_to_csv(working_directory, export_directory):
                     channel_id = r_channel.properties["DAC~Channel~Id"]
                     module_id = r_channel.properties["DAC~Device~Name"].replace(' ','-')
                     start_time = str(r_channel.properties["wf_start_time"]).replace(':','-')
+                    print("TDMS start time:", start_time)
 
                     # print("Device ID: {0}\nChannel ID: {1}\nModule ID: {2}".format(device_id, channel_id, module_id))
 
